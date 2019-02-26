@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">OpenLoad</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <!-- Strings related to login -->
+    <string name="enter_url">Enter URL</string>
+    <string name="submit">Submit</string>
+    <string name="enter_email">Enter Email</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="register">Register</string>
+    <string name="enter_name">Enter Name</string>
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="history">History</string>
+    <string name="logout">Logout</string>
+    <string name="login">login</string>
+    <string name="movie_header">Movie Header</string>
+    <string name="view">View</string>
+    <string name="textview">TextView</string>
+    <string name="click_for_google_login">Sign up with google</string>
+    <string name="click_for_facebook_login">Continue with Facebook</string>
+    <string name="head_image">Head Image</string>
+    <string name="cross_divider">Cross Divider</string>
+    <string name="logo">Logo</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="descriptionheader">DescriptionHeader</string>
+    <string name="description">Openload is a free online storage and sharing platform. It operates on the same premise as Dropbox, allowing users to access storage in the cloud, free of charge. Unlike Dropbox, Openload pays for their costs by displaying ads on the site, so the more traffic they get, the better off the site is.
+
+You’re probably familiar with the cloud, which is a term used to refer to the process of uploading files to virtual servers, typically linked to real servers in multiple locations. Each user receives a tiny amount of the allotted space on the physical server, but can upload anything they like. However, sites like WeTransfer, Drobox, Google Drive, etc., usually have anti-piracy regulations in place. They either limit the size of your upload or actively scan for content that you don’t own to prevent you from uploading and sharing movies and media. Openload doesn’t.
+
+With no upload limit (there’s no upper limit on how many files you can add), no limits to download or upload speed, and online streaming for media files with no limits on how many users can view files and no requirement for an account, Openload actually seems a lot like it was built for piracy, even though the owners likely had more traditional media sharing in mind.</string>
+    <string name="description_header">Description</string>
+    <string name="search_hint">I\'m feeling lucky !!</string>
+    <string name="gender">Gender : </string>
+    <string name="male">Male</string>
+    <string name="name">Name : </string>
+    <string name="email">Email : </string>
+    <string name="xyz_abc_com">xyz@abc.com</string>
+    <string name="abcd">abcd</string>
+
+
+</resources>

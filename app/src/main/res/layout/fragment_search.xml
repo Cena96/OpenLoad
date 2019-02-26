@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="?attr/actionBarSize"
+    android:background="@android:color/white"
+    android:tag="SearchF"
+    tools:context=".SearchFragment">
+
+
+    <EditText
+        android:id="@+id/et_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="150dp"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:background="@drawable/border1"
+        android:ems="10"
+        android:inputType="text"
+        android:padding="10dp"
+        android:textColorHint="@color/colorPrimaryDark"
+        android:hint="@string/enter_url"
+        android:textAlignment="center"/>
+
+    <ImageView
+        android:id="@+id/iv_search_drawable"
+        android:layout_width="40dp"
+        android:layout_height="37dp"
+        android:layout_marginTop="154dp"
+        android:layout_marginStart="18dp"
+        app:srcCompat="@drawable/search_icon" />
+
+    <Button
+        android:id="@+id/btn_url_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="300dp"
+        android:layout_marginTop="220dp"
+        android:background="@drawable/border1"
+        android:text="@string/submit"
+        android:textColor="@color/colorPrimaryDark" />
+</FrameLayout>
