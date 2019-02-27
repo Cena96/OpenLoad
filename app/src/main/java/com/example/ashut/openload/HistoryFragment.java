@@ -42,7 +42,7 @@ public class HistoryFragment extends Fragment {
 
         moviesList = new ArrayList<>();
 
-        View view = inflater.inflate(R.layout.activity_history, container, false);
+        View view = inflater.inflate(R.layout.fragment_history, container, false);
 
         unbinder = ButterKnife.bind(this, view);
 

@@ -32,7 +32,7 @@ public class LoginRegisterFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.activity_login_register, container, false);
+        View v = inflater.inflate(R.layout.fragment_login_register, container, false);
 
         unbinder = ButterKnife.bind(this, v);
 

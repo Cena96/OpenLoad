@@ -37,11 +37,13 @@ With no upload limit (there’s no upper limit on how many files you can add), n
     <string name="description_header">Description</string>
     <string name="search_hint">I\'m feeling lucky !!</string>
     <string name="gender">Gender : </string>
-    <string name="male">Male</string>
     <string name="name">Name : </string>
     <string name="email">Email : </string>
     <string name="xyz_abc_com">xyz@abc.com</string>
     <string name="abcd">abcd</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="confirm_password">Confirm Password</string>
 
 
 </resources>

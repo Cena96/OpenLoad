@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity
     private Stack<Fragment> stack;
     private Unbinder unbinder;
 
+//    private ApiService apiService;
+
     private FragmentManager mFragmentManager;
     private static String API_KEY = "6LeUcJAUAAAAANvvh0IBNGGkVhzPomiUs1fay8x7";
 
@@ -61,6 +63,8 @@ public class MainActivity extends AppCompatActivity
 
         mFragmentManager = getSupportFragmentManager();
         stack = new Stack<>();
+
+
 
         unbinder=ButterKnife.bind(this);
         toolbar.setNavigationIcon(R.drawable.threelines);
