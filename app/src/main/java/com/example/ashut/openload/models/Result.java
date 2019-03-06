@@ -18,6 +18,35 @@ public class Result {
     @SerializedName("updatedAt")
     @Expose
     private String updatedAt;
+    @SerializedName("Email")
+    @Expose
+    private String email;
+    @SerializedName("Gender")
+    @Expose
+    private String gender;
+    @SerializedName("Password")
+    @Expose
+    private String password;
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public String getObjectId() {
         return objectId;
@@ -29,6 +58,10 @@ public class Result {
 
     public String getName() {
         return name;
+    }
+
+    public String getEmail(){
+        return email;
     }
 
     public void setName(String name) {

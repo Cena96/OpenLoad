@@ -1,7 +1,9 @@
 package com.example.ashut.openload;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,25 +17,38 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.ashut.openload.models.Result;
+
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 public class LoginFragment extends Fragment implements LoginRegisterFragment.onFragmentInteraction {
 
     @BindView(R.id.et_email2)
+    TextInputEditText etEmail;
+    @BindView(R.id.et_password2)
     TextInputEditText etPassword;
-    @BindView(R.id.et_password2) TextInputEditText etEmail;
     @BindView(R.id.btn_submit2)
     Button btnLogin;
-    @BindView(R.id.btn_google) Button btnGoogle;
-    @BindView(R.id.btn_facebook) Button btnFb;
 
+    ApiService apiService;
     private Unbinder unbinder;
     private LoginFragment.OnFragmentInteractionListener mListener;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -45,38 +60,87 @@ public class LoginFragment extends Fragment implements LoginRegisterFragment.onF
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
+        Objects.requireNonNull(getActivity()).setTitle("Login");
+
+
         View v = inflater.inflate(R.layout.fragment_login, container, false);
 
-        unbinder= ButterKnife.bind(this,v);
-
-//        Intent i=new Intent();
-//        i.putExtra("Name",etName.getText().toString());
-//        i.putExtra("Email",etEmail.getText().toString());
-//        i.putExtra("Password",etPassword.getText().toString());
-
-        btnGoogle.setOnClickListener(v13 -> Toast.makeText(getContext(), "Google Login Initiated", Toast.LENGTH_SHORT).show());
+        unbinder = ButterKnife.bind(this, v);
+        apiService = OpenLoadApplication.getApiService();
 
         btnLogin.setOnClickListener(v12 -> {
-            if (isValidCredentials(Objects.requireNonNull(etEmail.getText()).toString(),
-                    Objects.requireNonNull(etPassword.getText()).toString())) {
-                startActivity(new Intent(getActivity(), MainActivity.class));
-            } else {
-                Toast.makeText(getContext(), "Invalid Credentials", Toast.LENGTH_SHORT).show();
+
+            String email = etEmail.getText().toString();
+            String password = etPassword.getText().toString();
+
+            if (isValidCredentials(Objects.requireNonNull(email),
+                    Objects.requireNonNull(password))) {
+
+                checkUser(email, password);
             }
         });
-
-        btnFb.setOnClickListener(v1 -> Toast.makeText(getContext(), "Facebook Login Initiated", Toast.LENGTH_SHORT).show());
-
         return v;
-
     }
+
+    private void checkUser(String email, String password) {
+
+        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        // set cancelable to false
+        progressDialog.setCancelable(false);
+        // set message
+        progressDialog.setMessage("Logging in,please wait");
+        progressDialog.show();
+
+        SharedPreferences preferences = Objects.requireNonNull(
+                getActivity())
+                .getSharedPreferences(
+                        "ID",
+                        MODE_PRIVATE);
+
+        String r = preferences.getString("id", null);
+        apiService.verifyUser(r).enqueue(new Callback<Result>() {
+            @Override
+            public void onResponse(Call<Result> call, Response<Result> response) {
+                if (response.isSuccessful()) {
+
+                    String verifyUserEmail = Objects.requireNonNull(response.body()).getEmail();
+                    String verifyUserPassword = response.body().getPassword();
+
+                    progressDialog.dismiss();
+                    Toast.makeText(getContext(), "Successfully logged in!", Toast.LENGTH_LONG)
+                            .show();
+
+                    if (email.equals(verifyUserEmail) &&
+                            password.equals(verifyUserPassword)) {
+
+                        Intent intent = new Intent(getContext(), MainActivity.class);
+                        intent.putExtra("name", response.body().getName());
+                        intent.putExtra("email", verifyUserEmail);
+                        startActivity(intent);
+
+                    } else {
+                        progressDialog.dismiss();
+                        Toast.makeText(getContext(), "User not registered", Toast.LENGTH_LONG)
+                                .show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Result> call, Throwable t) {
+                Toast.makeText(getContext(), "Error signing in", Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
+            }
+        });
+    }
+
 
     public boolean isValidCredentials(String Email, String Password) {
         return !TextUtils.isEmpty(Email) && !TextUtils.isEmpty(Password);
     }
 
 
-    // TODO: Rename method, update argument and hook method into UI event
+// TODO: Rename method, update argument and hook method into UI event
 //    public void onButtonPressed(Uri uri) {
 //        if (mListener != null) {
 //            mListener.onFragmentInteraction(uri);
@@ -86,11 +150,12 @@ public class LoginFragment extends Fragment implements LoginRegisterFragment.onF
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
         if (context instanceof LoginFragment.OnFragmentInteractionListener) {
             mListener = (LoginFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnFragmentInteractionListenerHistory");
         }
     }
 
@@ -102,12 +167,19 @@ public class LoginFragment extends Fragment implements LoginRegisterFragment.onF
 
 
     @Override
-    public void openLogin() {
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override
-    public void openRegister() {
+    public void openFragment(Fragment fragment) {
 
+        assert getFragmentManager() != null;
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     /**
@@ -125,12 +197,5 @@ public class LoginFragment extends Fragment implements LoginRegisterFragment.onF
         void onFragmentInteraction(Uri uri);
 
     }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
 
 }

@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.ashut.openload.models.Movie;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,14 +24,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class HistoryFragment extends Fragment {
+public class HistoryFragment extends Fragment implements RecyclerViewHistoryClickListener {
 
-    private HistoryFragment.OnFragmentInteractionListener mListener;
-
+    private OnFragmentInteractionListenerHistory mListener;
+    RecyclerViewHistoryClickListener recyclerViewHistoryClickListener;
 
     private Unbinder unbinder;
     MovieAdapter adapter;
-    List<Movies> moviesList;
+    List<Movie> moviesList;
 
     @BindView(R.id.rv_parent_list)
     RecyclerView rvMovielist;
@@ -49,12 +51,12 @@ public class HistoryFragment extends Fragment {
         rvMovielist.setLayoutManager(new LinearLayoutManager(getContext()));
 
         String VIEW = "View";
-
-        moviesList.add(new Movies(R.drawable.kgf, "KGF", VIEW));
-        moviesList.add(new Movies(R.drawable.padmavati, "Padmavati", VIEW));
-        moviesList.add(new Movies(R.drawable.rsz_uri, "URI", VIEW));
-        moviesList.add(new Movies(R.drawable.bahubali, "Bahubali:The Beginning", VIEW));
-        moviesList.add(new Movies(R.drawable.bahubali2, "Bahubali:The Conclusion", VIEW));
+//
+//        moviesList.add(new Movies(R.drawable.kgf, "KGF", VIEW,null));
+//        moviesList.add(new Movies(R.drawable.padmavati, "Padmavati", VIEW,null));
+//        moviesList.add(new Movies(R.drawable.rsz_uri, "URI", VIEW,null));
+//        moviesList.add(new Movies(R.drawable.bahubali, "Bahubali:The Beginning", VIEW,null));
+//        moviesList.add(new Movies(R.drawable.bahubali2, "Bahubali:The Conclusion", VIEW,null));
 
         rvMovielist.setItemAnimator(new DefaultItemAnimator());
 
@@ -70,23 +72,26 @@ public class HistoryFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
+    @Override
+    public void onAnimateItemClick(int adapterPosition, Movie moviesList, ImageView ivMoviehead, String transtitionName) {
 
-    public interface OnFragmentInteractionListener extends RecyclerViewClickListener {
+    }
+
+
+    public interface OnFragmentInteractionListenerHistory extends RecyclerViewHistoryClickListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
 
-        @Override
-        void onAnimateItemClick(int adapterPosition, Movies moviesList, ImageView ivMoviehead, String transtitionName);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof LoginFragment.OnFragmentInteractionListener) {
-            mListener = (HistoryFragment.OnFragmentInteractionListener) context;
+            mListener = (OnFragmentInteractionListenerHistory) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnFragmentInteractionListenerHistory");
         }
     }
 

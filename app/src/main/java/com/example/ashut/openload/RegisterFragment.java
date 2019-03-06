@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.example.ashut.openload.models.Result;
 
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -79,30 +81,46 @@ public class RegisterFragment extends Fragment implements LoginRegisterFragment.
             String confirmPassword = etPasswordConfirmReg.getText().toString();
             String gender = radioBtnGender.getText().toString();
 
-            validateCred(name, email, password, confirmPassword);
+            if (validateCred(name, email, password, confirmPassword, gender)) {
 
-            registerUser(name, email, password, gender);
+                registerUser(name, email, password, gender);
 
-            mListener.openLogin();
+                mListener.openFragment(new LoginFragment());
+            }
         });
         return itemView;
     }
 
-    private void validateCred(String name, String email, String password, String confirmPassword) {
+    private boolean validateCred(String name, String email, String password, String confirmPassword, String gender) {
 
-        if (name != null) {
+        if (name == null) {
             etName.setError("Field Required");
+            return false;
         }
+
         if (!(email.contains("@"))) {
-            etEmailReg.setError("Field Required");
+            etEmailReg.setError("Invalid Email");
+            return false;
         }
+
         if (password == null && confirmPassword == null) {
             etPasswordReg.setError("Field Required");
             etPasswordConfirmReg.setError("Field Required");
+            return false;
         }
+
+        assert password != null;
         if (!(password.equals(confirmPassword))) {
             etPasswordConfirmReg.setError("Password doesn't Match");
+            return false;
         }
+
+        if (gender == null) {
+            radioBtnGender.setError("Field Required");
+            return false;
+
+        }
+        return true;
     }
 
     private void registerUser(String name, String email, String password, String gender) {
@@ -121,17 +139,27 @@ public class RegisterFragment extends Fragment implements LoginRegisterFragment.
                 progressDialog.dismiss();
 
                 Result result = response.body();
+
+                assert result != null;
                 String id = result.getObjectId();
 
-                SharedPreferences preferences = getActivity().getSharedPreferences("ID", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
+                SharedPreferences preferences = Objects.requireNonNull(getContext())
+                        .getSharedPreferences("ID", Context.MODE_PRIVATE);
 
+                SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("id", id);
+                editor.putString("email", email);
+                editor.putString("gender",gender);
+                editor.putString("password", password);
+                editor.putString("name", name);
+
                 editor.apply();
 
                 if (response.isSuccessful()) {
                     Log.e("Tag", "Message : " + id);
+
                     Toast.makeText(getContext(), " Successfully Registered", Toast.LENGTH_SHORT).show();
+
                 } else
                     Toast.makeText(getContext(), "Registeration failed", Toast.LENGTH_SHORT).show();
             }
@@ -152,7 +180,7 @@ public class RegisterFragment extends Fragment implements LoginRegisterFragment.
             mListener = (RegisterFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnFragmentInteractionListenerHistory");
         }
     }
 
@@ -163,14 +191,10 @@ public class RegisterFragment extends Fragment implements LoginRegisterFragment.
     }
 
     @Override
-    public void openLogin() {
-        openLogin();
-    }
-
-    @Override
-    public void openRegister() {
+    public void openFragment(Fragment fragment) {
 
     }
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -184,7 +208,7 @@ public class RegisterFragment extends Fragment implements LoginRegisterFragment.
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void openLogin();
+        void openFragment(Fragment fragment);
     }
 
     @Override

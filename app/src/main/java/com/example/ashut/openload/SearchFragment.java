@@ -1,6 +1,7 @@
 package com.example.ashut.openload;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,11 +21,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.example.ashut.openload.models.Movie;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -41,10 +45,14 @@ public class SearchFragment extends Fragment {
     ImageView ivEtDrawable;
     @BindView(R.id.btn_url_submit)
     Button btnUrlSubmit;
+    @BindView(R.id.iv_load_img)
+    ImageView ivLoadUrl;
 
     private Unbinder unbinder;
     private String url = "https://www5.fmovie.cc/?s=";
+    private ArrayList<Movie> movies;
     private SearchFragment.OnFragmentInteractionListener mListener;
+    ProgressDialog progressDialog;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -62,10 +70,11 @@ public class SearchFragment extends Fragment {
         //Creating instances of view
 
         unbinder = ButterKnife.bind(this, v);
+        progressDialog = new ProgressDialog(getContext());
 
         webView = new WebView(getContext());
         webView.getSettings().setJavaScriptEnabled(true);
-
+        movies = new ArrayList<>();
         webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webView.addJavascriptInterface(new MyJavascriptInterface(getContext()), "HtmlViewer");
 
@@ -82,15 +91,18 @@ public class SearchFragment extends Fragment {
 
         //Adding listener to button view
         btnUrlSubmit.setOnClickListener(v12 -> {
-
+            String movieName = etUrl.getText().toString();
+            progressDialog.setMessage("Showing results for " + movieName);
+            progressDialog.setCancelable(false);
+            progressDialog.show();
             //get url from the search bar
-            String url = etUrl.getText().toString();
+            String URL = url + movieName;
+            Log.e("Tag", URL);
 
-            if (TextUtils.isEmpty(url)) {
+            if (TextUtils.isEmpty(URL)) {
                 etUrl.setError("Required Field");
             } else {
-                webView.loadUrl(url);
-//                    mListener.openResult();
+                webView.loadUrl(URL);
             }
         });
 
@@ -100,53 +112,67 @@ public class SearchFragment extends Fragment {
     private void getHtml() {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(() -> webView.loadUrl("javascript:window.HtmlViewer.showHTML" +
-                "('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');"), 10000);
+                        "('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');")
+                , 5000);
     }
 
     private void getWebsite(final String html) {
 
+
         //Since connect() and get() work synchronously we keep them in a worker/separate thread
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final StringBuilder builder = new StringBuilder();
-                try {
+        new Thread(() -> {
+            final StringBuilder builder = new StringBuilder();
+            try {
 
-                    //Document object instance of the html page
-                    Document doc = Jsoup.parse(html);
-                    String title = doc.title();
+                //Document object instance of the html page
+                Document doc = Jsoup.parse(html);
 
-                    //To store links we create an element object which stores the elements(links) of the document(website)
-                    Elements links = doc.getElementsByTag("a");
-                    builder.append(title).append("\n");
+                Elements outerClass = doc.getElementsByClass("item movies");
 
+                for (Element linkOuterClass : outerClass) {
 
-                    //Iterating through the links
-                    for (Element link : links) {
-                        String hrefText = link.attr("href");
+                    Elements className = linkOuterClass
+                            .getElementsByClass("hobcontainer");
 
-                        if (hrefText.startsWith("https://www5.fmovies.com/movies/")) {
-                            Log.e("TAG", hrefText);
-                        }
+                    Log.e("Tag", "2");
 
-                        /*
-                         * Store the movie name,genre,year,description,Rating through if else
-                         *
-                         * Optional - Actors and Directors
-                         */
+                    for (Element linkClass : className) {
 
-                        builder.append("\n\n").append("Link : ").append(link.attr("href"))
-                                .append("\n\n")
-                                .append("Text : ")
-                                .append(link.text()
-                                );
+                        //To store links we create an element object
+                        // which stores the elements(links) of the document(website)
+
+                        Elements links = linkClass.getElementsByTag("a");
+                        Log.e("Tag", "1");
+
+                        //Getting image url for a movie
+                        String image = links.get(0)
+                                .getElementsByTag("img")
+                                .attr("data-src");
+
+                        //Getting movie description link
+                        String link = links.get(0).attr("href");
+
+                        //Getting movie name
+                        String movie = links.get(0).getElementsByTag("img")
+                                .attr("alt");
+
+                        //Adding movie details to the movie array list
+                        movies.add(new Movie(movie, image, link));
+
+                        Log.e("Tag", "SRC " + image);
+                        Log.e("Tag", "Data " + movie);
+                        Log.e("Tag", "Href Text " + link);
+
                     }
-
-                } catch (Exception e) {
-                    builder.append("Error :").append(e.getMessage()).append("\n");
                 }
-
+                progressDialog.dismiss();
+                Log.e("Tag", "Movie list result : " + movies);
+            } catch (Exception e) {
+                e.printStackTrace();
+                builder.append("Error :").append(e.getMessage()).append("\n");
             }
+            Objects.requireNonNull(getActivity())
+                    .runOnUiThread(() -> mListener.openResult(movies));
         }).start();
 
     }
@@ -165,7 +191,7 @@ public class SearchFragment extends Fragment {
             mListener = (SearchFragment.OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnFragmentInteractionListenerHistory");
         }
     }
 
@@ -179,6 +205,7 @@ public class SearchFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
 
+        void openResult(ArrayList<Movie> movies);
     }
 
     @Override
@@ -186,6 +213,7 @@ public class SearchFragment extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
     }
+
 
     class MyJavascriptInterface {
 
@@ -197,8 +225,6 @@ public class SearchFragment extends Fragment {
 
         @JavascriptInterface
         void showHTML(final String html) {
-//        new AlertDialog.Builder(context).setTitle("HTML").setMessage(html).setPositiveButton(android.R.string.ok, null)
-//                .create().show();
             getWebsite(html);
             Log.d("Text", html);
         }

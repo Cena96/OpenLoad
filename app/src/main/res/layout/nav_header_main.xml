@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
@@ -14,27 +13,29 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/nav_header_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/profile_pic"
         android:layout_gravity="center"/>
 
     <TextView
+        android:id="@+id/nav_header_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:textColor="#000000"
-        android:text="@string/nav_header_title"
         android:gravity="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
+        android:id="@+id/nav_header_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
         android:textColor="#000000"
+        android:maxLines="2"
         android:layout_gravity="center"
-        android:text="@string/nav_header_subtitle"
         tools:ignore="TextViewEdits" />
 
 </LinearLayout>

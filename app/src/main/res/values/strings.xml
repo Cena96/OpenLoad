@@ -17,7 +17,7 @@
     <string name="profile">Profile</string>
     <string name="history">History</string>
     <string name="logout">Logout</string>
-    <string name="login">login</string>
+    <string name="login">Login</string>
     <string name="movie_header">Movie Header</string>
     <string name="view">View</string>
     <string name="textview">TextView</string>
@@ -44,6 +44,13 @@ With no upload limit (there’s no upper limit on how many files you can add), n
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="confirm_password">Confirm Password</string>
+
+    <string name="facebook_app_id">430728854331588</string>
+    <string name="facebook_access_token">430728854331588|eQ8lrkU5tzYzFTcnL06Eht9CGwM</string>
+    <string name="fb_login_protocol_scheme">fb430728854331588</string>
+    <string name="google_client_id">586779109709-r30dv4jk1cbtfamiuqero3gcfs055a4u.apps.googleusercontent.com</string>
+    <string name="download">Download</string>
+    <string name="movie_name">Movie Name</string>
 
 
 </resources>

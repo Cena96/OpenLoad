@@ -14,17 +14,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.ashut.openload.models.Movie;
+
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieRecyclerViewHolder> {
 
-    private RecyclerViewClickListener mlistener;
+    private RecyclerViewHistoryClickListener mlistener;
 
-    private List<Movies> moviesList;
+    private List<Movie> moviesList;
     private int lastPosition = -1;
     private Context context;
 
-    MovieAdapter(RecyclerViewClickListener mlistener, List<Movies> moviesList, Context context) {
+    MovieAdapter(RecyclerViewHistoryClickListener mlistener, List<Movie> moviesList, Context context) {
         this.mlistener = mlistener;
         this.moviesList = moviesList;
         this.context = context;
@@ -33,36 +35,40 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieRecycle
     @NonNull
     @Override
     public MovieRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View itemview = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.movie_items, viewGroup, false);
+        View itemview = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.movie_items, viewGroup, false);
         return new MovieRecyclerViewHolder(itemview, mlistener);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final MovieRecyclerViewHolder movieRecyclerViewHolder, final int i) {
+    public void onBindViewHolder(@NonNull final MovieRecyclerViewHolder movieRecyclerViewHolder
+            , final int i) {
 
-        final Movies movies = moviesList.get(i);
+        final Movie movie = moviesList.get(i);
 
         movieRecyclerViewHolder.btndownload.setTag(i);
-        movieRecyclerViewHolder.ivMoviehead.setImageResource(movies.getMovie_image());
 
-        ViewCompat.setTransitionName(movieRecyclerViewHolder.ivMoviehead, movies.getMovieName());
+        ViewCompat.setTransitionName(movieRecyclerViewHolder.ivMoviehead, movie.getMovieName());
 
-        movieRecyclerViewHolder.tvmovieName.setText(movies.getMovieName());
+        movieRecyclerViewHolder.tvmovieName.setText(movie.getMovieName());
         movieRecyclerViewHolder.btndownload.setText(R.string.view);
 
         //Sending details as Bundle to description page
         DescriptionFragment dfragment = new DescriptionFragment();
         Bundle args = new Bundle();
-        args.putInt("movieImage", movies.getMovie_image());
-        args.putString("movieName", movies.getMovieName());
+
+        args.putString("movieImage", movie.getMovieImgUrl());
+        args.putString("movieName", movie.getMovieName());
         dfragment.setArguments(args);
 
         movieRecyclerViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mlistener.onAnimateItemClick(movieRecyclerViewHolder.getAdapterPosition()
-                        , movies
-                        , movieRecyclerViewHolder.ivMoviehead, movieRecyclerViewHolder.ivMoviehead.getTransitionName());
+                mlistener.onAnimateItemClick
+                        (movieRecyclerViewHolder.getAdapterPosition()
+                        , movie
+                        , movieRecyclerViewHolder.ivMoviehead
+                        , movieRecyclerViewHolder.ivMoviehead.getTransitionName());
             }
         });
 
@@ -78,13 +84,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieRecycle
 
     class MovieRecyclerViewHolder extends RecyclerView.ViewHolder {
 
-        private RecyclerViewClickListener mlistener;
+        private RecyclerViewHistoryClickListener mlistener;
 
         TextView tvmovieName;
         Button btndownload;
         ImageView ivMoviehead;
 
-        MovieRecyclerViewHolder(@NonNull View itemView, RecyclerViewClickListener listener) {
+        MovieRecyclerViewHolder(@NonNull View itemView, RecyclerViewHistoryClickListener listener) {
             super(itemView);
 
             mlistener = listener;
@@ -109,7 +115,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieRecycle
     }
 }
 
-interface RecyclerViewClickListener {
+interface RecyclerViewHistoryClickListener {
 
-    void onAnimateItemClick(int adapterPosition, Movies moviesList, ImageView ivMoviehead, String transtitionName);
+    void onAnimateItemClick(int adapterPosition, Movie moviesList, ImageView ivMoviehead, String transtitionName);
 }

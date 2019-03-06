@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="Toolbar"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/menu_btn_login"
+        android:orderInCategory="300"
+        android:title="@string/login"
+        android:visible="true"/>
+    <item
+        android:id="@+id/menu_btn_logout"
+        android:orderInCategory="400"
+        android:title="@string/logout"
+        android:visible="false"/>
+</menu>

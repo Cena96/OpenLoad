@@ -39,14 +39,14 @@ public class LoginRegisterFragment extends Fragment {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.openLogin();
+                mListener.openFragment(new LoginFragment());
             }
         });
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.openRegister();
+                mListener.openFragment(new RegisterFragment());
 
             }
         });
@@ -65,7 +65,7 @@ public class LoginRegisterFragment extends Fragment {
             mListener = (LoginRegisterFragment.onFragmentInteraction) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnFragmentInteractionListenerHistory");
         }
     }
 
@@ -76,9 +76,8 @@ public class LoginRegisterFragment extends Fragment {
     }
 
     public interface onFragmentInteraction {
-        void openLogin();
+        void openFragment(Fragment fragment);
 
-        void openRegister();
     }
 
     @Override

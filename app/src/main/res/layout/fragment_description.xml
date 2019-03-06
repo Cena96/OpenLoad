@@ -13,46 +13,57 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="160dp"
-                android:contentDescription="@string/descriptionheader"
-                android:scaleType="fitXY"
-                app:srcCompat="@drawable/nav_header_background" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:contentDescription="@string/descriptionheader"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/nav_header_background" />
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-50dp"
-                app:srcCompat="@drawable/profile_pic"
-                android:layout_gravity="center"
-                android:contentDescription="@string/movie_header"/>
+        <ImageView
+            android:id="@+id/iv_movie_title"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="-100dp"
+            android:contentDescription="@string/movie_header"
+            android:padding="20dp"
+            android:src="@drawable/profile_pic" />
 
-            <TextView
-                android:id="@+id/tv_movie_description_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:textStyle="bold"
-                android:text="Movie Name"
-                android:layout_gravity="center"/>
+        <TextView
+            android:id="@+id/tv_movie_description_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/movie_name"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/movie_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/description_header"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-black"/>
+        <TextView
+            android:id="@+id/tv_movie_description_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:fontFamily="sans-serif-black"
+            android:text="@string/description_header"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tv_description"
-                android:padding="@dimen/activity_horizontal_margin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/description"/>
-        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:text="@string/description" />
+
+        <Button
+            android:id="@+id/btn_download_movie"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:background="@color/colorSkyBlue"
+            android:text="@string/download" />
+    </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>

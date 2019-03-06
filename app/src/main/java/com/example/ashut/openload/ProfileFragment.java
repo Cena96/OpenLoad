@@ -14,8 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.example.ashut.openload.models.Example;
@@ -23,7 +21,6 @@ import com.example.ashut.openload.models.Result;
 
 import java.util.Objects;
 
-import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -40,26 +37,43 @@ public class ProfileFragment extends Fragment {
     private CircleImageView profileImage;
     private TextInputEditText etName;
     private TextInputEditText etEmail;
-    private RadioGroup rgGender;
-    private RadioButton rbGender;
+    private TextInputEditText etGender;
     private Button btnProfileSubmit;
-
+    private String name, email, gender;
 
     private Unbinder unbinder;
     ApiService apiService;
 
-    Result result=null;
+    LoginFragment fragment;
 
-    public ProfileFragment() {
+    Result result = null;
 
+    public static ProfileFragment newInstance(String name, String email, String gender) {
+        Bundle b = new Bundle();
+        b.getString("Name");
+        b.getString("email");
+        b.getString("gender");
+
+        ProfileFragment profileFragment = new ProfileFragment();
+        profileFragment.setArguments(b);
+
+        return profileFragment;
+    }
+
+    public void readBundle(Bundle bundle) {
+        if (bundle != null) {
+            name = bundle.getString("Name");
+            email = bundle.getString("Email");
+            gender = bundle.getString("gender");
+        }
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        apiService=OpenLoadApplication.getApiService();
-
-        result=new Result();
+        apiService = OpenLoadApplication.getApiService();
+        fragment = new LoginFragment();
+        result = new Result();
     }
 
     @Override
@@ -71,33 +85,44 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        View view = null;
+
+        if (savedInstanceState == null) {
+
+            view = inflater.inflate(R.layout.fragment_profile, container, false);
+            profileImage = view.findViewById(R.id.iv_profile_img);
+            etName = view.findViewById(R.id.tv_name_value);
+            etEmail = view.findViewById(R.id.tv_email_value);
+            etGender = view.findViewById(R.id.et_gender);
+            btnProfileSubmit = view.findViewById(R.id.btn_profile_submit);
+
+
+            SharedPreferences preferences = Objects.requireNonNull(getContext())
+                    .getSharedPreferences(
+                            "ID",
+                            Context.MODE_PRIVATE);
+            etName.setText(preferences.getString("name", null));
+            etEmail.setText(preferences.getString("email", null));
+            etGender.setText(preferences.getString("gender", null));
+
+        }
+
+
         Objects.requireNonNull(getActivity()).setTitle("Profile");
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        profileImage = view.findViewById(R.id.iv_profile_img);
-        etName = view.findViewById(R.id.tv_name_value);
-        etEmail = view.findViewById(R.id.tv_email_value);
+        readBundle(getArguments());
 
-        rgGender=view.findViewById(R.id.rg_gender_profile);
-        rgGender.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                checkedId=rgGender.getCheckedRadioButtonId();
-                rbGender=view.findViewById(checkedId);
-            }
-        });
-
-        btnProfileSubmit=view.findViewById(R.id.btn_profile_submit);
 
         btnProfileSubmit.setOnClickListener(v -> {
 
-            String name=etName.getText().toString();
+            String name = Objects.requireNonNull(etName.getText()).toString();
 
-            String email=etEmail.getText().toString();
+            String email = Objects.requireNonNull(etEmail.getText()).toString();
 
-            String gender=rbGender.getText().toString();
+            String gender = Objects.requireNonNull(etGender.getText()).toString();
 
-            postProfile(name,email,gender);
+            postProfile(name, email, gender);
+
         });
 
         return view;
@@ -112,29 +137,36 @@ public class ProfileFragment extends Fragment {
         progressDialog.setMessage("Please Wait");
         progressDialog.show();
 
-        SharedPreferences preferences=getActivity().getSharedPreferences("ID",MODE_PRIVATE);
+        SharedPreferences preferences = Objects.requireNonNull(
+                getActivity())
+                .getSharedPreferences(
+                        "ID",
+                        MODE_PRIVATE);
 
-        String r=preferences.getString("id",null);
+        String r = preferences.getString("id", null);
 
-        apiService.createProfile(r,name,email,gender).enqueue(new Callback<Example>() {
+        apiService.updateProfile(r, name, email, gender).enqueue(new Callback<Example>() {
 
             @Override
-            public void onResponse(Call<Example> call, Response<Example> response) {
+            public void onResponse(@NonNull Call<Example> call, @NonNull Response<Example> response) {
                 progressDialog.dismiss();
 
-                if(response.isSuccessful()){
-                    Log.e("Tag","Message : "+r);
-                    Toast.makeText(getContext(),"Profile Updated",Toast.LENGTH_LONG).show();
-                }
-                else{
-                    Toast.makeText(getContext(),"Update Error",Toast.LENGTH_LONG).show();
+                if (response.isSuccessful()) {
+                    Log.e("Tag", "Message : " + r);
+                    Toast.makeText(getContext(), "Profile Updated", Toast.LENGTH_LONG).show();
+
+                    ((MainActivity) Objects.requireNonNull(getActivity()))
+                            .updateNavHeader(name,email);
+
+                } else {
+                    Toast.makeText(getContext(), "Update Error", Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Example> call, Throwable t) {
+            public void onFailure(@NonNull Call<Example> call, @NonNull Throwable t) {
                 progressDialog.dismiss();
-                Toast.makeText(getContext(),t.getMessage(),Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_LONG).show();
 
             }
         });
@@ -146,16 +178,6 @@ public class ProfileFragment extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
-//    }
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
