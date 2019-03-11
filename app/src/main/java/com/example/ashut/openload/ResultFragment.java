@@ -54,10 +54,10 @@ public class ResultFragment extends Fragment implements ResultRecyclerViewListen
     private String downloadLink = null;
     private String movieName = null;
     private String movieYear = null;
-    private String movieGenre[] = new String[10];
+    private String movieGenreTemp = "";
     private String movieDescription = null;
     private String movieImageUrl = null;
-
+    private String movieGenre = "";
 
     @BindView(R.id.rv_result_list)
     RecyclerView rv_result_list;
@@ -127,8 +127,10 @@ public class ResultFragment extends Fragment implements ResultRecyclerViewListen
 
     private void getHtml() {
         Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(() -> webView.loadUrl("javascript:window.HtmlViewer.showHTML" +
-                        "('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');")
+        handler.postDelayed(() -> {
+                    webView.loadUrl("javascript:window.HtmlViewer.showHTML" +
+                            "('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
+                }
                 , 10000);
     }
 
@@ -173,11 +175,15 @@ public class ResultFragment extends Fragment implements ResultRecyclerViewListen
                         String urlSplitter[] = hrefAttr.split("/");
                         if (urlSplitter.length > 4) {
                             if (urlSplitter[3].equals("genre")) {
-                                movieGenre[i++] = urlSplitter[4];
+                                movieGenreTemp = movieGenreTemp + urlSplitter[4] + ",";
                             }
                         }
                     }
-
+                    String movieG[] = movieGenreTemp.split(",");
+                    movieGenre = movieGenre + movieG[0];
+                    for (int i1 = 1; i1 < movieG.length; i1++) {
+                        movieGenre = movieGenre + "," + movieG[i1];
+                    }
                     for (Element outercustomfieldslink : outerCustomFieldsLink) {
 
                         Elements outerYearLink = outercustomfieldslink
@@ -198,7 +204,7 @@ public class ResultFragment extends Fragment implements ResultRecyclerViewListen
                 Movie movie = new Movie(movieName, movieImageUrl, movieGenre, movieYear, downloadLink
                         , movieDescription);
 
-                Log.e("Tag", "Movie description result : " + movie);
+                Log.e("Tag", "Movie description profileResult : " + movie);
                 mListener.openDescription(movie);
             }
         }).start();

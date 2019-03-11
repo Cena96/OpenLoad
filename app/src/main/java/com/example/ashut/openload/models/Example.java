@@ -8,16 +8,16 @@ import java.util.List;
 
 public class Example {
 
-    @SerializedName("results")
+    @SerializedName("profileResults")
     @Expose
-    private List<Result> results = null;
+    private List<ProfileResult> profileResults = null;
 
-    public List<Result> getResults() {
-        return results;
+    public List<ProfileResult> getProfileResults() {
+        return profileResults;
     }
 
-    public void setResults(List<Result> results) {
-        this.results = results;
+    public void setProfileResults(List<ProfileResult> profileResults) {
+        this.profileResults = profileResults;
     }
 
 }

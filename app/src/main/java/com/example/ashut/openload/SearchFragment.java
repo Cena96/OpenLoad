@@ -166,7 +166,7 @@ public class SearchFragment extends Fragment {
                     }
                 }
                 progressDialog.dismiss();
-                Log.e("Tag", "Movie list result : " + movies);
+                Log.e("Tag", "Movie list profileResult : " + movies);
             } catch (Exception e) {
                 e.printStackTrace();
                 builder.append("Error :").append(e.getMessage()).append("\n");

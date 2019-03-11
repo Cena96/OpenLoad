@@ -17,7 +17,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.ashut.openload.models.Example;
-import com.example.ashut.openload.models.Result;
+import com.example.ashut.openload.models.ProfileResult;
 
 import java.util.Objects;
 
@@ -46,7 +46,7 @@ public class ProfileFragment extends Fragment {
 
     LoginFragment fragment;
 
-    Result result = null;
+    ProfileResult profileResult = null;
 
     public static ProfileFragment newInstance(String name, String email, String gender) {
         Bundle b = new Bundle();
@@ -73,7 +73,7 @@ public class ProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
         apiService = OpenLoadApplication.getApiService();
         fragment = new LoginFragment();
-        result = new Result();
+        profileResult = new ProfileResult();
     }
 
     @Override
@@ -101,9 +101,19 @@ public class ProfileFragment extends Fragment {
                     .getSharedPreferences(
                             "ID",
                             Context.MODE_PRIVATE);
-            etName.setText(preferences.getString("name", null));
-            etEmail.setText(preferences.getString("email", null));
-            etGender.setText(preferences.getString("gender", null));
+            SharedPreferences preferences1 = getContext().getSharedPreferences
+                    ("ChangeId", Context.MODE_PRIVATE);
+            String changeId = preferences.getString("changedid", null);
+            String id = preferences.getString("id", null);
+            if (id != null && changeId != null) {
+                etName.setText(preferences.getString("name", null));
+                etEmail.setText(preferences.getString("email", null));
+                etGender.setText(preferences.getString("gender", null));
+            } else {
+                etName.setText("");
+                etEmail.setText("");
+                etGender.setText("");
+            }
 
         }
 
@@ -120,12 +130,30 @@ public class ProfileFragment extends Fragment {
             String email = Objects.requireNonNull(etEmail.getText()).toString();
 
             String gender = Objects.requireNonNull(etGender.getText()).toString();
-
-            postProfile(name, email, gender);
+            if (verifyCred(name, email, gender))
+                postProfile(name, email, gender);
 
         });
 
         return view;
+    }
+
+    private boolean verifyCred(String name, String email, String gender) {
+        if (name == null) {
+            etName.setError("This field is required");
+            return false;
+        } else if (email == null) {
+            etName.setError("This field is requrired");
+            return false;
+        } else if (!(email.contains("@"))) {
+            etEmail.setError("Invalid email format");
+            return false;
+        } else if (gender == null) {
+            etGender.setError("This field is required");
+            return false;
+        }
+
+        return true;
     }
 
     private void postProfile(String name, String email, String gender) {
@@ -156,7 +184,7 @@ public class ProfileFragment extends Fragment {
                     Toast.makeText(getContext(), "Profile Updated", Toast.LENGTH_LONG).show();
 
                     ((MainActivity) Objects.requireNonNull(getActivity()))
-                            .updateNavHeader(name,email);
+                            .updateNavHeader(name, email);
 
                 } else {
                     Toast.makeText(getContext(), "Update Error", Toast.LENGTH_LONG).show();

@@ -16,7 +16,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.example.ashut.openload.models.Result;
+import com.example.ashut.openload.models.ProfileResult;
 
 import java.util.Objects;
 
@@ -132,40 +132,42 @@ public class RegisterFragment extends Fragment implements LoginRegisterFragment.
         progressDialog.show();
 
 
-        apiService.createUser(name, email, password, gender).enqueue(new Callback<Result>() {
+        apiService.createUser(name, email, password, gender).enqueue(new Callback<ProfileResult>() {
             @Override
-            public void onResponse(Call<Result> call, Response<Result> response) {
+            public void onResponse(Call<ProfileResult> call, Response<ProfileResult> response) {
 
                 progressDialog.dismiss();
 
-                Result result = response.body();
-
-                assert result != null;
-                String id = result.getObjectId();
-
-                SharedPreferences preferences = Objects.requireNonNull(getContext())
-                        .getSharedPreferences("ID", Context.MODE_PRIVATE);
-
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("id", id);
-                editor.putString("email", email);
-                editor.putString("gender",gender);
-                editor.putString("password", password);
-                editor.putString("name", name);
-
-                editor.apply();
-
                 if (response.isSuccessful()) {
+
+                    ProfileResult profileResult = response.body();
+
+                    assert profileResult != null;
+                    String id = profileResult.getObjectId();
+
+                    SharedPreferences preferences = Objects.requireNonNull(getContext())
+                            .getSharedPreferences("ID", Context.MODE_PRIVATE);
+
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString("id", id);
+                    editor.putString("email", email);
+                    editor.putString("gender", gender);
+                    editor.putString("password", password);
+                    editor.putString("name", name);
+
+                    editor.apply();
                     Log.e("Tag", "Message : " + id);
 
-                    Toast.makeText(getContext(), " Successfully Registered", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), " Successfully Registered", Toast.LENGTH_SHORT)
+                            .show();
 
                 } else
-                    Toast.makeText(getContext(), "Registeration failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Registeration failed", Toast.LENGTH_SHORT)
+                            .show();
             }
 
             @Override
-            public void onFailure(Call<Result> call, Throwable t) {
+            public void onFailure(Call<ProfileResult> call, Throwable t) {
                 progressDialog.dismiss();
                 Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }

@@ -56,6 +56,41 @@
             android:padding="@dimen/activity_horizontal_margin"
             android:text="@string/description" />
 
+        <TextView
+            android:id="@+id/tv_genre_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:fontFamily="sans-serif-black"
+            android:textStyle="bold"
+            android:text="@string/genre" />
+
+        <TextView
+            android:id="@+id/tv_genre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="-19dp"
+            android:fontFamily="sans-serif-black" />
+
+        <TextView
+            android:id="@+id/tv_year_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:fontFamily="sans-serif-black"
+            android:textStyle="bold"
+            android:text="@string/year" />
+
+        <TextView
+            android:id="@+id/tv_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="-19dp"
+            android:fontFamily="sans-serif-black"/>
+
+
         <Button
             android:id="@+id/btn_download_movie"
             android:layout_width="wrap_content"
@@ -64,6 +99,15 @@
             android:layout_marginTop="@dimen/activity_horizontal_margin"
             android:background="@color/colorSkyBlue"
             android:text="@string/download" />
+
+        <Button
+            android:id="@+id/btn_history"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorSkyBlue"
+            android:text="@string/check_history" />
     </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>

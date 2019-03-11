@@ -51,6 +51,10 @@ With no upload limit (there’s no upper limit on how many files you can add), n
     <string name="google_client_id">586779109709-r30dv4jk1cbtfamiuqero3gcfs055a4u.apps.googleusercontent.com</string>
     <string name="download">Download</string>
     <string name="movie_name">Movie Name</string>
+    <string name="movie_year">Movie Year</string>
+    <string name="check_history">Check History</string>
+    <string name="genre">Genre :</string>
+    <string name="year">Year :</string>
 
 
 </resources>

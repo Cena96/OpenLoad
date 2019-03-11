@@ -10,14 +10,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.ashut.openload.models.Result;
+import com.example.ashut.openload.models.ProfileResult;
 
 import java.util.Objects;
 
@@ -39,20 +43,30 @@ public class LoginFragment extends Fragment implements LoginRegisterFragment.onF
     TextInputEditText etPassword;
     @BindView(R.id.btn_submit2)
     Button btnLogin;
-
+    String r = null;
+    MenuItem item = null;
     ApiService apiService;
     private Unbinder unbinder;
+    Toolbar toolbar;
+    MenuItem btnMenuLogin;
+    MenuItem btnMenuLogout;
+
     private LoginFragment.OnFragmentInteractionListener mListener;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        toolbar = Objects.requireNonNull(getActivity()).findViewById(R.id.toolbar);
+        toolbar.inflateMenu(R.menu.menu_log);
+        btnMenuLogin = menu.findItem(R.id.menu_btn_login);
+        btnMenuLogout = menu.findItem(R.id.menu_btn_logout);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -62,20 +76,22 @@ public class LoginFragment extends Fragment implements LoginRegisterFragment.onF
 
         Objects.requireNonNull(getActivity()).setTitle("Login");
 
-
+        setHasOptionsMenu(false);
         View v = inflater.inflate(R.layout.fragment_login, container, false);
 
         unbinder = ButterKnife.bind(this, v);
+
+        getActivity().invalidateOptionsMenu();
+
         apiService = OpenLoadApplication.getApiService();
 
         btnLogin.setOnClickListener(v12 -> {
 
-            String email = etEmail.getText().toString();
-            String password = etPassword.getText().toString();
+            String email = Objects.requireNonNull(etEmail.getText()).toString();
+            String password = Objects.requireNonNull(etPassword.getText()).toString();
 
             if (isValidCredentials(Objects.requireNonNull(email),
                     Objects.requireNonNull(password))) {
-
                 checkUser(email, password);
             }
         });
@@ -97,12 +113,11 @@ public class LoginFragment extends Fragment implements LoginRegisterFragment.onF
                         "ID",
                         MODE_PRIVATE);
 
-        String r = preferences.getString("id", null);
-        apiService.verifyUser(r).enqueue(new Callback<Result>() {
+        r = preferences.getString("id", null);
+        apiService.verifyUser(r).enqueue(new Callback<ProfileResult>() {
             @Override
-            public void onResponse(Call<Result> call, Response<Result> response) {
+            public void onResponse(Call<ProfileResult> call, Response<ProfileResult> response) {
                 if (response.isSuccessful()) {
-
                     String verifyUserEmail = Objects.requireNonNull(response.body()).getEmail();
                     String verifyUserPassword = response.body().getPassword();
 
@@ -116,8 +131,13 @@ public class LoginFragment extends Fragment implements LoginRegisterFragment.onF
                         Intent intent = new Intent(getContext(), MainActivity.class);
                         intent.putExtra("name", response.body().getName());
                         intent.putExtra("email", verifyUserEmail);
-                        startActivity(intent);
 
+                        Bundle sendId = new Bundle();
+                        sendId.putString("id", response.body().getObjectId());
+                        DescriptionFragment fragment = new DescriptionFragment();
+                        fragment.setArguments(sendId);
+
+                        startActivity(intent);
                     } else {
                         progressDialog.dismiss();
                         Toast.makeText(getContext(), "User not registered", Toast.LENGTH_LONG)
@@ -127,13 +147,12 @@ public class LoginFragment extends Fragment implements LoginRegisterFragment.onF
             }
 
             @Override
-            public void onFailure(Call<Result> call, Throwable t) {
+            public void onFailure(Call<ProfileResult> call, Throwable t) {
                 Toast.makeText(getContext(), "Error signing in", Toast.LENGTH_SHORT).show();
                 progressDialog.dismiss();
             }
         });
     }
-
 
     public boolean isValidCredentials(String Email, String Password) {
         return !TextUtils.isEmpty(Email) && !TextUtils.isEmpty(Password);

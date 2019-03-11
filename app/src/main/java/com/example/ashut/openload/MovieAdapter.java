@@ -1,34 +1,31 @@
 package com.example.ashut.openload;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.ashut.openload.models.Movie;
+import com.example.ashut.openload.models.History;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieRecyclerViewHolder> {
 
-    private RecyclerViewHistoryClickListener mlistener;
+//    private RecyclerViewHistoryClickListener mlistener;
 
-    private List<Movie> moviesList;
+    private List<History> historyList;
     private int lastPosition = -1;
     private Context context;
 
-    MovieAdapter(RecyclerViewHistoryClickListener mlistener, List<Movie> moviesList, Context context) {
-        this.mlistener = mlistener;
-        this.moviesList = moviesList;
+    MovieAdapter(List<History> historyList, Context context) {
+        this.historyList = historyList;
         this.context = context;
     }
 
@@ -37,40 +34,25 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieRecycle
     public MovieRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View itemview = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.movie_items, viewGroup, false);
-        return new MovieRecyclerViewHolder(itemview, mlistener);
+        return new MovieRecyclerViewHolder(itemview);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final MovieRecyclerViewHolder movieRecyclerViewHolder
             , final int i) {
 
-        final Movie movie = moviesList.get(i);
+        final History movie = historyList.get(i);
 
-        movieRecyclerViewHolder.btndownload.setTag(i);
+        Picasso.get().load(movie.getHistoryResults().get(i).getImage())
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.error)
+                .into(movieRecyclerViewHolder.ivMoviehead);
 
-        ViewCompat.setTransitionName(movieRecyclerViewHolder.ivMoviehead, movie.getMovieName());
+        movieRecyclerViewHolder.tvMovieName.setText(movie.getHistoryResults().get(i).getName());
 
-        movieRecyclerViewHolder.tvmovieName.setText(movie.getMovieName());
-        movieRecyclerViewHolder.btndownload.setText(R.string.view);
+        movieRecyclerViewHolder.tvMovieGenre.setText(movie.getHistoryResults().get(i).getGenre());
 
-        //Sending details as Bundle to description page
-        DescriptionFragment dfragment = new DescriptionFragment();
-        Bundle args = new Bundle();
-
-        args.putString("movieImage", movie.getMovieImgUrl());
-        args.putString("movieName", movie.getMovieName());
-        dfragment.setArguments(args);
-
-        movieRecyclerViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mlistener.onAnimateItemClick
-                        (movieRecyclerViewHolder.getAdapterPosition()
-                        , movie
-                        , movieRecyclerViewHolder.ivMoviehead
-                        , movieRecyclerViewHolder.ivMoviehead.getTransitionName());
-            }
-        });
+        movieRecyclerViewHolder.tvMovieYear.setText(movie.getHistoryResults().get(i).getYear());
 
         setAnimation(movieRecyclerViewHolder.itemView, i);
 
@@ -78,27 +60,26 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieRecycle
 
     @Override
     public int getItemCount() {
-        return moviesList.size();
+        return historyList.size();
     }
 
 
     class MovieRecyclerViewHolder extends RecyclerView.ViewHolder {
 
-        private RecyclerViewHistoryClickListener mlistener;
+//        private RecyclerViewHistoryClickListener mlistener;
 
-        TextView tvmovieName;
-        Button btndownload;
+        TextView tvMovieName;
+        TextView tvMovieGenre;
+        TextView tvMovieYear;
         ImageView ivMoviehead;
 
-        MovieRecyclerViewHolder(@NonNull View itemView, RecyclerViewHistoryClickListener listener) {
+        MovieRecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            mlistener = listener;
-
-            ivMoviehead = itemView.findViewById(R.id.iv_movie_title);
-            tvmovieName = itemView.findViewById(R.id.tv_movie_name);
-            btndownload = itemView.findViewById(R.id.btn_download);
-
+            ivMoviehead = itemView.findViewById(R.id.iv_movie_image);
+            tvMovieName = itemView.findViewById(R.id.tv_movie_name);
+            tvMovieGenre = itemView.findViewById(R.id.tv_movie_genre);
+            tvMovieYear = itemView.findViewById(R.id.tv_movie_year);
         }
     }
 
@@ -107,7 +88,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieRecycle
         // If the bound view wasn't previously displayed on screen, it's animated
 
         if (position > lastPosition) {
-            Animation animation = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
+            Animation animation = AnimationUtils.loadAnimation(context,
+                    android.R.anim.slide_in_left);
             viewToAnimate.startAnimation(animation);
             lastPosition = position;
         }
@@ -116,6 +98,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieRecycle
 }
 
 interface RecyclerViewHistoryClickListener {
-
-    void onAnimateItemClick(int adapterPosition, Movie moviesList, ImageView ivMoviehead, String transtitionName);
+//    void onItemClick(int adapterPosition, ImageView view);
+//    void onAnimateItemClick(int adapterPosition, Movie historyList, ImageView ivMoviehead,
+//                            String transtitionName);
 }

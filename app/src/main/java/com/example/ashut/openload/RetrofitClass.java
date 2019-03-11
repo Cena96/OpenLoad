@@ -6,22 +6,26 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Body;
 
-public class RetrofitClass {
+class RetrofitClass {
     ApiService initialize() {
         MyInterceptor myInterceptor = new MyInterceptor();
 
         OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder();
         okHttpClient.addInterceptor(myInterceptor);
+        okHttpClient.addInterceptor(new HttpLoggingInterceptor().setLevel
+                (HttpLoggingInterceptor.Level.BODY));
+
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.parse.buddy.com/parse/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient.build())
                 .build();
-
         return retrofit.create(ApiService.class);
     }
 
