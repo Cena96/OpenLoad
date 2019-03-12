@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -61,6 +62,8 @@ public class HistoryFragment extends DialogFragment implements HistoryRecyclerVi
         SharedPreferences preferences = getActivity()
                 .getSharedPreferences("ID", Context.MODE_PRIVATE);
         String id = preferences.getString("id", null);
+        getActivity().registerReceiver(onDownloadComplete, new IntentFilter
+                (DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
         if (id != null) {
             getMoviesFromHistory();

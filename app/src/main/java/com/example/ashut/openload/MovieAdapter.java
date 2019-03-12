@@ -50,13 +50,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieRecycle
         movieRecyclerViewHolder.tvMovieGenre.setText(movie.getGenre());
         movieRecyclerViewHolder.tvMovieYear.setText(movie.getYear());
 
-        movieRecyclerViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        movieRecyclerViewHolder.btnDownloadMovie.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mlistener.onHistoryItemClick(i);
             }
         });
-
     }
 
     @Override
@@ -82,7 +81,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieRecycle
             btnDownloadMovie = itemView.findViewById(R.id.btn_download);
         }
     }
-
 }
 
 interface HistoryRecyclerViewListener {

@@ -50,7 +50,7 @@
             android:authorities="com.example.ashut.openload.DbProvider"
             android:exported="true"
             android:enabled="true"/>
-
+        <receiver android:name=".BroadcastReceiver" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="61c1b44072e4e717610811d184100815a784b728" />
