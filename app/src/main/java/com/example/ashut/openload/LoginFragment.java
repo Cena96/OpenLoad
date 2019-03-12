@@ -134,8 +134,13 @@ public class LoginFragment extends Fragment implements LoginRegisterFragment.onF
 
                         Bundle sendId = new Bundle();
                         sendId.putString("id", response.body().getObjectId());
+                        sendId.putString("name",response.body().getName());
+                        sendId.putString("email",response.body().getEmail());
+                        sendId.putString("gender",response.body().getGender());
                         DescriptionFragment fragment = new DescriptionFragment();
                         fragment.setArguments(sendId);
+                        ProfileFragment fragment1 = new ProfileFragment();
+                        fragment1.setArguments(sendId);
 
                         startActivity(intent);
                     } else {

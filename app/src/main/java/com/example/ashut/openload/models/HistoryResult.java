@@ -4,8 +4,6 @@ package com.example.ashut.openload.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 public class HistoryResult {
 
     @SerializedName("objectId")
@@ -23,12 +21,39 @@ public class HistoryResult {
     @SerializedName("Year")
     @Expose
     private String year;
+    @SerializedName("DownloadLink")
+    @Expose
+    private String downloadLink;
     @SerializedName("createdAt")
     @Expose
     private String createdAt;
     @SerializedName("updatedAt")
     @Expose
     private String updatedAt;
+
+    public HistoryResult() {
+
+    }
+
+    public HistoryResult(String name, String genre, String year, String imageUrl) {
+        super();
+        this.name = name;
+        this.genre = genre;
+        this.year = year;
+        image = imageUrl;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public String getDownloadLink() {
+        return downloadLink;
+    }
+
+    public void setDownloadLink(String downloadLink) {
+        this.downloadLink = downloadLink;
+    }
 
     public String getGenre() {
         return genre;

@@ -13,13 +13,12 @@ import android.support.annotation.Nullable;
 public class DbProvider extends ContentProvider {
 
 
-    public static final String PROVIDER = "com.example.ashut.openload";
+    public static final String PROVIDER = "com.example.ashut.openload.DbProvider";
     public static final String AUTHORITY = "content://" + PROVIDER;
 
     public static final String Table_Movie = "MovieTable";
 
     private SQLiteDatabase db;
-
     @Override
     public boolean onCreate() {
 

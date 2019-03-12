@@ -1,7 +1,6 @@
 package com.example.ashut.openload;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.ashut.openload.models.Example;
-import com.example.ashut.openload.models.ProfileResult;
 
 import java.util.Objects;
 
@@ -40,46 +38,27 @@ public class ProfileFragment extends Fragment {
     private TextInputEditText etGender;
     private Button btnProfileSubmit;
     private String name, email, gender;
-
+    String id = null;
     private Unbinder unbinder;
     ApiService apiService;
 
-    LoginFragment fragment;
-
-    ProfileResult profileResult = null;
-
-    public static ProfileFragment newInstance(String name, String email, String gender) {
-        Bundle b = new Bundle();
-        b.getString("Name");
-        b.getString("email");
-        b.getString("gender");
-
-        ProfileFragment profileFragment = new ProfileFragment();
-        profileFragment.setArguments(b);
-
-        return profileFragment;
-    }
-
-    public void readBundle(Bundle bundle) {
-        if (bundle != null) {
-            name = bundle.getString("Name");
-            email = bundle.getString("Email");
-            gender = bundle.getString("gender");
-        }
+    private void updateNullToViews() {
+        etName.setText("");
+        etEmail.setText("");
+        etGender.setText("");
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         apiService = OpenLoadApplication.getApiService();
-        fragment = new LoginFragment();
-        profileResult = new ProfileResult();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -88,54 +67,42 @@ public class ProfileFragment extends Fragment {
         View view = null;
 
         if (savedInstanceState == null) {
-
+            Objects.requireNonNull(getActivity()).setTitle("Profile");
             view = inflater.inflate(R.layout.fragment_profile, container, false);
             profileImage = view.findViewById(R.id.iv_profile_img);
             etName = view.findViewById(R.id.tv_name_value);
             etEmail = view.findViewById(R.id.tv_email_value);
             etGender = view.findViewById(R.id.et_gender);
             btnProfileSubmit = view.findViewById(R.id.btn_profile_submit);
+            readBundle(getArguments());
 
+        }
 
-            SharedPreferences preferences = Objects.requireNonNull(getContext())
-                    .getSharedPreferences(
-                            "ID",
-                            Context.MODE_PRIVATE);
-            SharedPreferences preferences1 = getContext().getSharedPreferences
-                    ("ChangeId", Context.MODE_PRIVATE);
-            String changeId = preferences.getString("changedid", null);
-            String id = preferences.getString("id", null);
-            if (id != null && changeId != null) {
-                etName.setText(preferences.getString("name", null));
-                etEmail.setText(preferences.getString("email", null));
-                etGender.setText(preferences.getString("gender", null));
+        //Getting values from Bundle
+
+        btnProfileSubmit.setOnClickListener(v -> {
+            String name = Objects.requireNonNull(etName.getText()).toString();
+            String email = Objects.requireNonNull(etEmail.getText()).toString();
+            String gender = Objects.requireNonNull(etGender.getText()).toString();
+            if (verifyCred(name, email, gender) && id != null)
+                postProfile(name, email, gender);
+        });
+        return view;
+    }
+
+    private void readBundle(Bundle arguments) {
+        if (arguments != null) {
+            String id = arguments.getString("id");
+            if (id != null) {
+                etName.setText(arguments.getString("name"));
+                etEmail.setText(arguments.getString("email"));
+                etGender.setText(arguments.getString("gender"));
             } else {
                 etName.setText("");
                 etEmail.setText("");
                 etGender.setText("");
             }
-
         }
-
-
-        Objects.requireNonNull(getActivity()).setTitle("Profile");
-
-        readBundle(getArguments());
-
-
-        btnProfileSubmit.setOnClickListener(v -> {
-
-            String name = Objects.requireNonNull(etName.getText()).toString();
-
-            String email = Objects.requireNonNull(etEmail.getText()).toString();
-
-            String gender = Objects.requireNonNull(etGender.getText()).toString();
-            if (verifyCred(name, email, gender))
-                postProfile(name, email, gender);
-
-        });
-
-        return view;
     }
 
     private boolean verifyCred(String name, String email, String gender) {
@@ -152,7 +119,6 @@ public class ProfileFragment extends Fragment {
             etGender.setError("This field is required");
             return false;
         }
-
         return true;
     }
 
@@ -170,11 +136,8 @@ public class ProfileFragment extends Fragment {
                 .getSharedPreferences(
                         "ID",
                         MODE_PRIVATE);
-
         String r = preferences.getString("id", null);
-
         apiService.updateProfile(r, name, email, gender).enqueue(new Callback<Example>() {
-
             @Override
             public void onResponse(@NonNull Call<Example> call, @NonNull Response<Example> response) {
                 progressDialog.dismiss();
@@ -185,7 +148,6 @@ public class ProfileFragment extends Fragment {
 
                     ((MainActivity) Objects.requireNonNull(getActivity()))
                             .updateNavHeader(name, email);
-
                 } else {
                     Toast.makeText(getContext(), "Update Error", Toast.LENGTH_LONG).show();
                 }

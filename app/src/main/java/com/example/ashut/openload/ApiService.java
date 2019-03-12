@@ -5,8 +5,6 @@ import com.example.ashut.openload.models.History;
 import com.example.ashut.openload.models.Movie;
 import com.example.ashut.openload.models.ProfileResult;
 
-import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -51,7 +49,8 @@ public interface ApiService {
     Call<Movie> postMovieToHistory(@Field("Image") String imageUrl,
                                    @Field("Name") String movieName,
                                    @Field("Genre") String movieGenre,
-                                   @Field("Year") String movieYear);
+                                   @Field("Year") String movieYear,
+                                   @Field("DownloadLink") String movieDownloadLink);
 
     @GET("classes/History")
     Call<History> getMovieFromHistory();

@@ -45,11 +45,11 @@
                 android:resource="@xml/searchable" />
         </activity>
 
-
         <provider
             android:name=".DbProvider"
-            android:authorities="com.example.ashut.openload"
-            android:exported="true" />
+            android:authorities="com.example.ashut.openload.DbProvider"
+            android:exported="true"
+            android:enabled="true"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"

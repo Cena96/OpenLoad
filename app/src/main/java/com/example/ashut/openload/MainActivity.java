@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ashut.openload.models.Movie;
 
@@ -38,8 +39,7 @@ public class MainActivity extends AppCompatActivity
         DescriptionFragment.OnFragmentInteractionListener,
         ResultFragment.OnFragmentInteractionListener,
         LoginRegisterFragment.onFragmentInteraction,
-        RecyclerViewHistoryClickListener,
-        NavigationView.OnNavigationItemSelectedListener {
+        NavigationView.OnNavigationItemSelectedListener, HistoryRecyclerViewListener {
 
     private static final long MOVE_DEFAULT_TIME = 1000;
     private static final long FADE_DEFAULT_TIME = 300;
@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity
     TextView email;
     String id = null;
 
+    //Modifying menu items according to the user token
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_log, menu);
@@ -74,22 +75,12 @@ public class MainActivity extends AppCompatActivity
         if (id != null) {
             btnMenuLogin.setVisible(false);
             btnMenuLogout.setVisible(true);
-
         }
-        btnMenuLogout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                item.setVisible(false);
-                btnMenuLogin.setVisible(true);
-                id=null;
-                SharedPreferences preferences1 = getSharedPreferences("ChangeId"
-                        , Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences1.edit();
-                editor.putString("changedid",id);
-                editor.apply();
-                updateNavHeader("", "");
-                return true;
-            }
+        btnMenuLogout.setOnMenuItemClickListener(item -> {
+            updateNavHeader("", "");
+            Toast.makeText(this, "Successfully Logged out", Toast.LENGTH_SHORT).show();
+            openFragment(new LoginRegisterFragment());
+            return false;
         });
         return true;
     }
@@ -112,6 +103,7 @@ public class MainActivity extends AppCompatActivity
             openFragment(new SearchFragment());
         }
 
+        //Setting action on options menu item of toolbar
         toolbar.setOnMenuItemClickListener(menuItem -> {
             if (menuItem.getItemId() == R.id.menu_btn_login) {
 
@@ -140,11 +132,9 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-
+    //Updating the navigation header
     public void updateNavHeader(String userName, String userEmail) {
-
         View header = navigationView.getHeaderView(0);
-
         user = header.findViewById(R.id.nav_header_name);
         user.setText(userName);
         email = header.findViewById(R.id.nav_header_email);
@@ -152,6 +142,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    //Setting actions on nav items
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -179,9 +170,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    //Clearing the fragment backstack
-
-
     public void openFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment)
@@ -191,6 +179,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction(Uri uri) {
+    }
+
+    @Override
+    public void onHistoryItemClick(int position) {
 
     }
 
@@ -198,39 +190,6 @@ public class MainActivity extends AppCompatActivity
     public void openHistory(Fragment fragment) {
         openFragment(fragment);
     }
-
-
-//    @Override
-//    public void onAnimateItemClick(int adapterPosition, Movie historyList, ImageView ivMoviehead, String transtitionName) {
-//        if (isDestroyed()) {
-//            return;
-//        }
-//        HistoryFragment hfragment = (HistoryFragment) mFragmentManager.findFragmentById(R.id.container);
-//        Fragment dfragment = DescriptionFragment.newInstance();
-//
-//        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-//
-//        Fade exitfade = new Fade();
-//        exitfade.setDuration(FADE_DEFAULT_TIME);
-//        Objects.requireNonNull(hfragment).setExitTransition(exitfade);
-//
-//        TransitionSet enterTransitionSet = new TransitionSet();
-//        enterTransitionSet.addTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.move));
-//        enterTransitionSet.setDuration(MOVE_DEFAULT_TIME);
-//        enterTransitionSet.setStartDelay(FADE_DEFAULT_TIME);
-//        dfragment.setSharedElementEnterTransition(enterTransitionSet);
-//        dfragment.startPostponedEnterTransition();
-//
-//        Fade enterFade = new Fade();
-//        enterFade.setStartDelay(MOVE_DEFAULT_TIME + FADE_DEFAULT_TIME);
-//        enterFade.setDuration(FADE_DEFAULT_TIME);
-//        dfragment.setEnterTransition(enterFade);
-//
-//        View logo = ivMoviehead.findViewById(R.id.iv_movie_title);
-//        fragmentTransaction.addSharedElement(logo, logo.getTransitionName());
-//        fragmentTransaction.replace(R.id.container, dfragment);
-//        fragmentTransaction.commitAllowingStateLoss();
-//    }
 
     @Override
     public void openResult(ArrayList<Movie> movies) {

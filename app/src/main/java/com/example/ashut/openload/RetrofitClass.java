@@ -9,7 +9,6 @@ import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Body;
 
 class RetrofitClass {
     ApiService initialize() {
@@ -38,6 +37,7 @@ class RetrofitClass {
                     addHeader("X-Parse-Application-Id", "19a6b30f-3aeb-4b74-b372-d2eeca4847ea").
                     addHeader("Content-Type", "application/json").
                     addHeader("X-Parse-Master-Key", "WMZlHD9b5IajTdaXLe7UN6J4LqXV5QHj").
+                    addHeader("X-Parse-Revocable-Session", "1").
                     build();
             return chain.proceed(newRequest);
         }

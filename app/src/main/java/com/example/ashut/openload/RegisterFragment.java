@@ -60,7 +60,7 @@ public class RegisterFragment extends Fragment implements LoginRegisterFragment.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View itemView = inflater.inflate(R.layout.fragment_register, null, false);
+        View itemView = inflater.inflate(R.layout.fragment_register, container, false);
         getActivity().setTitle("Register");
 
         unbinder = ButterKnife.bind(this, itemView);
@@ -82,57 +82,49 @@ public class RegisterFragment extends Fragment implements LoginRegisterFragment.
             String gender = radioBtnGender.getText().toString();
 
             if (validateCred(name, email, password, confirmPassword, gender)) {
-
-                registerUser(name, email, password, gender);
-
+                registerUser(name, email, password,gender);
                 mListener.openFragment(new LoginFragment());
             }
         });
         return itemView;
     }
 
+    //Validating user creds
     private boolean validateCred(String name, String email, String password, String confirmPassword, String gender) {
-
         if (name == null) {
             etName.setError("Field Required");
             return false;
         }
-
         if (!(email.contains("@"))) {
             etEmailReg.setError("Invalid Email");
             return false;
         }
-
         if (password == null && confirmPassword == null) {
             etPasswordReg.setError("Field Required");
             etPasswordConfirmReg.setError("Field Required");
             return false;
         }
-
         assert password != null;
         if (!(password.equals(confirmPassword))) {
             etPasswordConfirmReg.setError("Password doesn't Match");
             return false;
         }
-
         if (gender == null) {
             radioBtnGender.setError("Field Required");
             return false;
-
         }
         return true;
     }
 
-    private void registerUser(String name, String email, String password, String gender) {
+    private void registerUser(String name, String email, String password,String gender) {
         final ProgressDialog progressDialog = new ProgressDialog(getContext());
         // set cancelable to false
         progressDialog.setCancelable(false);
         // set message
         progressDialog.setMessage("Registering,please wait");
         progressDialog.show();
-
-
-        apiService.createUser(name, email, password, gender).enqueue(new Callback<ProfileResult>() {
+        //Calling post api to create a new user
+        apiService.createUser(name, email, password,gender).enqueue(new Callback<ProfileResult>() {
             @Override
             public void onResponse(Call<ProfileResult> call, Response<ProfileResult> response) {
 

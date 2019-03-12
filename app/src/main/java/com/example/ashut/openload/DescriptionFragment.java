@@ -28,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ashut.openload.models.Movie;
-import com.google.android.gms.common.api.Api;
 import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
@@ -72,6 +71,12 @@ public class DescriptionFragment extends Fragment {
     private Unbinder unbinder;
     private long downloadId = 0;
     private String downloadMovie;
+    private String movieName = null;
+    private String movieYear = null;
+    private String movieGenre = null;
+    private String movieDescription = null;
+    private String movieImageUrl = null;
+    private String downloadLink = null;
 
     private OnFragmentInteractionListener mListener;
 
@@ -99,7 +104,6 @@ public class DescriptionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
         View v = inflater.inflate(R.layout.fragment_description, container, false);
         unbinder = ButterKnife.bind(this, v);
         Objects.requireNonNull(getActivity()).registerReceiver(onDownloadComplete
@@ -113,14 +117,14 @@ public class DescriptionFragment extends Fragment {
 
         String objectId = objectPreferences.getString("id", null);
 
-        String downloadLink = Objects.requireNonNull(movieDetails).getMovieDownloadLink();
-        String movieName = movieDetails.getMovieName();
-        String movieYear = movieDetails.getMovieYear();
-        String movieGenre = movieDetails.getMovieGenre();
-        String movieDescription = movieDetails.getMovieDescription();
-        String movieImageUrl = movieDetails.getMovieImgUrl();
-        postMovieToHistory(movieImageUrl,movieName,movieGenre,movieYear);
+        downloadLink = Objects.requireNonNull(movieDetails).getMovieDownloadLink();
+        movieName = movieDetails.getMovieName();
+        movieYear = movieDetails.getMovieYear();
+        movieGenre = movieDetails.getMovieGenre();
+        movieDescription = movieDetails.getMovieDescription();
+        movieImageUrl = movieDetails.getMovieImgUrl();
 
+        getActivity().setTitle("You have searched : " + movieName);
         //Creating list of data of movie class
         updateUI(movieName, movieImageUrl, movieDescription, movieGenre, movieYear);
 
@@ -161,25 +165,10 @@ public class DescriptionFragment extends Fragment {
 
         progressDialog = new ProgressDialog(getContext());
 
-        SharedPreferences preferences = Objects.requireNonNull(getActivity())
-                .getSharedPreferences("Movie", Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putString("image", movieImageUrl);
-        editor.putString("name", movieName);
-        editor.putString("genre", movieGenre);
-        editor.putString("year", movieYear);
-        editor.putString("description", movieDescription);
-        editor.putString("downloadlink", downloadLink);
-
-        editor.apply();
-
         btnDownloadMovie.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 progressDialog = new ProgressDialog(getContext());
-                progressDialog.setMessage("Initiating download process");
                 progressDialog.setCancelable(false);
                 progressDialog.show();
                 loadDownloadLink(downloadLink);
@@ -187,25 +176,22 @@ public class DescriptionFragment extends Fragment {
             }
         });
 
-        btnHistory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.openHistory(new HistoryFragment());
-            }
-        });
+        btnHistory.setOnClickListener(v1 -> mListener.openHistory
+                (new HistoryFragment()));
 
         return v;
 
     }
 
-    private void postMovieToHistory(String movieImageUrl, String movieName,String movieGenre, String movieYear) {
-        ApiService apiService=OpenLoadApplication.getApiService();
-        apiService.postMovieToHistory(movieImageUrl,movieName,movieGenre,movieYear)
+    private void postMovieToHistory(String movieImageUrl, String movieName, String movieGenre
+            , String movieYear, String downloadLink) {
+        ApiService apiService = OpenLoadApplication.getApiService();
+        apiService.postMovieToHistory(movieImageUrl, movieName, movieGenre, movieYear, downloadLink)
                 .enqueue(new Callback<Movie>() {
                     @Override
                     public void onResponse(Call<Movie> call, Response<Movie> response) {
-                        if(response.isSuccessful()){
-                            Log.e("Tag","@@@@@@@@@Successfully posted@@@@@@@@@@");
+                        if (response.isSuccessful()) {
+                            Log.e("Tag", "@@@@@@@@@Successfully posted@@@@@@@@@@");
                         }
                     }
 
@@ -214,24 +200,45 @@ public class DescriptionFragment extends Fragment {
 
                     }
                 });
-
     }
 
     private void loadDownloadLink(String downloadLink) {
-        webView.loadUrl(downloadLink);
+        if (downloadLink == null) {
+            progressDialog.dismiss();
+            Toast.makeText(getContext(), "No download link found", Toast.LENGTH_SHORT).show();
+        } else
+            webView.loadUrl(downloadLink);
     }
 
-    private void parseDownloadLink(String downloadLink) {
+    private void parseDownloadLink(String downloadLinks) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
 
                     //Document object instance of the html page
-                    Document doc = Jsoup.parse(downloadLink);
-                    downloadMovie = doc.getElementsByClass("button_small tooltip")
+                    Document doc = Jsoup.parse(downloadLinks);
+                    downloadLink = doc.getElementsByClass("button_small tooltip")
                             .attr("href");
-                    startDownloading(downloadMovie);
+
+
+                    SharedPreferences preferences = Objects.requireNonNull(getActivity())
+                            .getSharedPreferences("Movie", Context.MODE_PRIVATE);
+
+                    SharedPreferences.Editor editor = preferences.edit();
+
+                    editor.putString("image", movieImageUrl);
+                    editor.putString("name", movieName);
+                    editor.putString("genre", movieGenre);
+                    editor.putString("year", movieYear);
+                    editor.putString("description", movieDescription);
+                    editor.putString("downloadlink", downloadLink);
+
+                    editor.apply();
+                    progressDialog.dismiss();
+                    postMovieToHistory(movieImageUrl, movieName, movieGenre, movieYear, downloadLink);
+
+                    startDownloading(downloadLink);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -262,24 +269,24 @@ public class DescriptionFragment extends Fragment {
         DownloadManager downloadManager = (DownloadManager) getActivity()
                 .getSystemService(DOWNLOAD_SERVICE);
         downloadId = downloadManager.enqueue(request);
-
     }
 
     private void createMovieDb(String movieName, String movieGenre, String movieYear
             , String downloadLink, String movieImageUrl, String movieDescription) {
 
-        String uriMovie = DbProvider.AUTHORITY + "/" + DbProvider.Table_Movie + "/";
+        String uriMovie = DbProvider.AUTHORITY + "/" + DbProvider.Table_Movie;
         uri = Uri.parse(uriMovie);
 
         ContentValues movieValues = new ContentValues();
         movieValues.put("Name", movieName);
-        movieValues.put("Description", movieDescription);
         movieValues.put("Genre", movieGenre);
         movieValues.put("Year", movieYear);
-        movieValues.put("ImageUrl", movieImageUrl);
         movieValues.put("DownloadLink", downloadLink);
+        movieValues.put("ImageUrl", movieImageUrl);
+        movieValues.put("Description", movieDescription);
 
-        Objects.requireNonNull(getActivity().getApplicationContext()).getContentResolver()
+        Objects.requireNonNull(Objects.requireNonNull(getActivity())
+                .getApplicationContext()).getContentResolver()
                 .insert(uri, movieValues);
 
     }

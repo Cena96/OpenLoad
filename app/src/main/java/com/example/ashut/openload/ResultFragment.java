@@ -146,12 +146,16 @@ public class ResultFragment extends Fragment implements ResultRecyclerViewListen
 
                     for (Element linkOuterClass : outerdownloadLink) {
 
-                        Elements innerdownloadLink = linkOuterClass
-                                .getElementsByClass("dwld");
+                        if (linkOuterClass
+                                .getElementsByClass("dwld").size() == 0) {
+                            downloadLink = null;
 
-                        downloadLink = innerdownloadLink.get(0).getElementsByTag("a")
-                                .attr("href");
-
+                        } else {
+                            Elements innerdownloadLink = linkOuterClass
+                                    .getElementsByClass("dwld");
+                            downloadLink = innerdownloadLink.get(0).getElementsByTag("a")
+                                    .attr("href");
+                        }
                         Log.e("Tag", "2");
                         if (downloadLink != null) {
                             break;
@@ -201,8 +205,8 @@ public class ResultFragment extends Fragment implements ResultRecyclerViewListen
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                Movie movie = new Movie(movieName, movieImageUrl, movieGenre, movieYear, downloadLink
-                        , movieDescription);
+                Movie movie = new Movie(movieName, movieImageUrl, movieGenre, movieYear
+                        , downloadLink, movieDescription);
 
                 Log.e("Tag", "Movie description profileResult : " + movie);
                 mListener.openDescription(movie);

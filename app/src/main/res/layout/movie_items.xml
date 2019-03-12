@@ -49,4 +49,15 @@
         android:fontFamily="sans-serif-black"
         android:text="@string/year"
         android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/btn_download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/iv_movie_image"
+        android:layout_below="@id/tv_movie_year"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="13dp"
+        android:background="@color/colorSkyBlue"
+        android:text="@string/download"/>
 </RelativeLayout>

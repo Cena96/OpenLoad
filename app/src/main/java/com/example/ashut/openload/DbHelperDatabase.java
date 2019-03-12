@@ -19,7 +19,8 @@ public class DbHelperDatabase extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("Create table "
                 + MOVIE_TABLE
-                + "(Name text,Description text,Genre text,Year text,ImageUrl text,DownloadLink text)");
+                + "(Name text,Genre text,Year text,DownloadLink text,ImageUrl text,Description text)"
+        );
     }
 
     @Override
