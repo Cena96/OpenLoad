@@ -13,7 +13,7 @@ jobs:
       - run:
           name: Download Dependencies
           command:
-            sudo chmod 777 ~code/gradlew
+            sudo chmod 777 ~/code/gradlew
             ./gradlew androidDependencies
          
       - save_cache:
