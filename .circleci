@@ -1,0 +1,254 @@
+version: 2
+jobs:
+  build_master:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-25-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: build-cache-{{ arch }}-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: build-cache-{{ arch }}-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Run lint
+          command: |
+            ./gradlew lint
+      - store_artifacts:
+          path: app/build/reports
+          destination: reports/
+      - run:
+          name: Run build
+          command: |
+            ./gradlew assemble
+      - store_artifacts:
+          path: app/build/outputs/apk
+          destination: apks/
+
+  build_develop:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-25-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: build-cache-{{ arch }}-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: |
+            ./gradlew androidDependencies
+            yes | sdkmanager --licenses
+      - run:
+          name: Download mailutils
+          command: sudo apt-get install mailutils
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: build-cache-{{ arch }}-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Run lint
+          command: |
+            ./gradlew lintStagingp1Debug
+      - store_artifacts:
+          path: app/build/reports
+          destination: reports/
+      - run:
+          name: Run build
+          command: |
+            ./gradlew assembleStagingp1Debug
+      - store_artifacts:
+          path: app/build/outputs/apk
+          destination: apks/
+
+  upload_report:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-25-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: build-cache-{{ arch }}-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: build-cache-{{ arch }}-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Run lint
+          command: |
+            ./gradlew lintStagingp1Debug
+      - store_artifacts:
+          path: app/build/reports
+          destination: reports/
+      - run:
+          name: Install file package
+          command: sudo apt-get install file
+      - run:
+          name: Upload report to Google drive
+          command: |
+            cd gdrive_uploader
+            ./upload.sh -v -r 1XXK9Dzl7OVIXZuXbE5XHXY2Q9prmhDU0 ../app/build/reports
+
+ #     - run:
+ #         name: Send email
+ #         command: |
+ #           echo "hello world" | mail -s "a subject" nareninindia@gmail.com
+
+  test_develop:
+    working_directory: ~/code
+    docker:
+      #- image: postman/newman_ubuntu1404
+      - image: justb4/jmeter
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - run:
+          name: Run API tests
+          command: |
+            jmeter.sh -n -t sample.jmx
+
+  upload_qa:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-25-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: build-cache-{{ arch }}-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: build-cache-{{ arch }}-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Run lint
+          command: |
+            ./gradlew lintStagingp1Debug
+      - store_artifacts:
+          path: app/build/reports
+          destination: reports/
+      - run:
+          name: Upload QA build to Fabric Beta
+          command: |
+            ./gradlew assembleStagingp1Debug crashlyticsUploadDistributionStagingp1Debug
+            ./gradlew assembleStagingp2Debug crashlyticsUploadDistributionStagingp2Debug
+      - store_artifacts:
+          path: app/build/outputs/apk
+          destination: apks/
+
+  upload_uat:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-25-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: build-cache-{{ arch }}-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: build-cache-{{ arch }}-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Upload QA build to Fabric Beta
+          command: |
+            ./gradlew assembleStagingp1Debug crashlyticsUploadDistributionStagingp1Debug
+            ./gradlew assembleProductionp2Release crashlyticsUploadDistributionProductionp2Release
+      - store_artifacts:
+          path: app/build/outputs/apk
+          destination: apks/
+
+  # Need to add Fabric beta upload step in build_qa
+  build_qa:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-25-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - restore_cache:
+          key: build-cache-{{ arch }}-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: |
+            ./gradlew androidDependencies
+            yes | sdkmanager --licenses
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: build-cache-{{ arch }}-jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Run lint
+          command: |
+            ./gradlew lintStagingp1Debug
+      - store_artifacts:
+          path: app/build/reports
+          destination: reports/
+      - run:
+          name: Run build
+          command: |
+            ./gradlew assembleStagingp1Debug
+      - store_artifacts:
+          path: app/build/outputs/apk
+          destination: apks/
+
+workflows:
+  version: 2
+
+  build_app:
+    jobs:
+      - build_master:
+          filters:
+            branches:
+              only:
+                - master
+      #- upload_report:
+       #   filters:
+        #    branches:
+         #     only:
+          #      - develop
+      - build_develop:
+          filters:
+            branches:
+              only:
+                - develop
+      #- test_develop:
+       #   filters:
+        #    branches:
+         #     only:
+          #      - develop
+          #requires:
+           # - build_develop
+      - upload_qa:
+          filters:
+            branches:
+              only:
+                - qa
+      - upload_uat:
+          filters:
+            branches:
+              only:
+                - uat
